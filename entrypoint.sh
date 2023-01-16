@@ -161,8 +161,10 @@ if [[ $arch = "arm64" ]]; then
         neutron_path="$(pwd)"
         cd "$workdir"/"$kernel_path" || exit 127
         
-        make_opts="LLVM=1 LLVM_IAS=1 CC=$neutron_path/bin/clang AR=$neutron_path/bin/llvm-ar LD=$neutron_path/bin/ld.lld NM=$neutron_path/bin/llvm-nm OBJCOPY=$neutron_path/bin/llvm-objcopy OBJDUMP=$neutron_path/bin/llvm-objdump OBJSIZE=$neutron_path/bin/llvm-size READELF=$neutron_path/bin/llvm-readelf STRIP=$neutron_path/bin/llvm-strip"
-        make_opts+=" HOSTCC=$neutron_path/bin/clang HOSTCXX=$neutron_path/bin/clang++ HOSTLD=$neutron_path/bin/ld.lld"
+        make_opts="LLVM=1 LLVM_IAS=1 CC=$neutron_path/bin/clang AR=$neutron_path/bin/llvm-ar LD=$neutron_path/bin/ld.lld"
+        make_opts+=" NM=$neutron_path/bin/llvm-nm OBJCOPY=$neutron_path/bin/llvm-objcopy OBJDUMP=$neutron_path/bin/llvm-objdump"
+        make_opts+=" OBJSIZE=$neutron_path/bin/llvm-size READELF=$neutron_path/bin/llvm-readelf STRIP=$neutron_path/bin/llvm-strip"
+        host_make_opts="HOSTCC=$neutron_path/bin/clang HOSTCXX=$neutron_path/bin/clang++ HOSTLD=$neutron_path/bin/ld.lld"
 
         export PATH="$neutron_path/bin:${PATH}"
         export CROSS_COMPILE="$neutron_path/bin/aarch64-linux-gnu-"
