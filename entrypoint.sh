@@ -36,7 +36,7 @@ msg "Updating container..."
 apt update && apt upgrade -y
 msg "Installing essential packages..."
 apt install -y --no-install-recommends git make bc bison openssl \
-    curl zstd tar sha256sum zip kmod cpio flex libelf-dev libssl-dev libtfm-dev wget \
+    curl zstd tar zip kmod cpio flex libelf-dev libssl-dev libtfm-dev wget \
     device-tree-compiler ca-certificates python3 python2
 ln -sf "/usr/bin/python${python_version}" /usr/bin/python
 set_output hash "$(cd "$kernel_path" && git rev-parse HEAD || exit 127)"
@@ -142,7 +142,10 @@ if [[ $arch = "arm64" ]]; then
         # disable certificate check
         echo "Downloading Neutron Clang 16"
         mkdir /nclang && cd /nclang
-        bash <(wget --no-check-certificate -qO- "$url") -S
+        if ! bash <(wget --no-check-certificate -qO- "$url") -S; then
+            err "Compiler package not found, refer to the README for details"
+            exit 1
+        fi
 
         if $binutils; then
             make_opts="CC=clang"
