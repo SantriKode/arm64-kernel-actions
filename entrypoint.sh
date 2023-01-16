@@ -141,7 +141,7 @@ if [[ $arch = "arm64" ]]; then
         # Due to different time in container and the host,
         # disable certificate check
         echo "Downloading Neutron Clang 16"
-        mkdir /nclang && cd /nclang
+        mkdir -p /nclang && cd /nclang
         if ! bash <(wget --no-check-certificate -qO- "$url") -S; then
             err "Compiler package not found, refer to the README for details"
             exit 1
@@ -160,11 +160,13 @@ if [[ $arch = "arm64" ]]; then
         cd /nclang || exit 127
         neutron_path="$(pwd)"
         cd "$workdir"/"$kernel_path" || exit 127
+        
+        make_opts="LLVM=1 LLVM_IAS=1 CC=$neutron_path/bin/clang AR=$neutron_path/bin/llvm-ar LD=$neutron_path/bin/ld.lld NM=$neutron_path/bin/llvm-nm OBJCOPY=$neutron_path/bin/llvm-objcopy OBJDUMP=$neutron_path/bin/llvm-objdump OBJSIZE=$neutron_path/bin/llvm-size READELF=$neutron_path/bin/llvm-readelf STRIP=$neutron_path/bin/llvm-strip"
+        make_opts+=" HOSTCC=$neutron_path/bin/clang HOSTCXX=$neutron_path/bin/clang++ HOSTLD=$neutron_path/bin/ld.lld"
 
         export PATH="$neutron_path/bin:${PATH}"
-        export CLANG_TRIPLE="/nclang/bin/aarch64-linux-gnu-"
-        export CROSS_COMPILE="/nclang/bin/aarch64-linux-gnu-"
-        export CROSS_COMPILE_ARM32="/nclang/bin/arm-linux-gnueabi-"
+        export CROSS_COMPILE="$neutron_path/bin/aarch64-linux-gnu-"
+        export CROSS_COMPILE_ARM32="$neutron_path/bin/arm-linux-gnueabi-"
     elif [[ $compiler = aosp-clang/* ]]; then
         ver="${compiler/aosp-clang\/}"
         ver_number="${ver/\/binutils}"
