@@ -142,10 +142,7 @@ if [[ $arch = "arm64" ]]; then
         # disable certificate check
         echo "Downloading Neutron Clang 16"
         mkdir /nclang && cd /nclang
-        if ! bash <(wget --no-check-certificate -qO- "$url") -S &> /dev/null; then
-            err "Failed downloading toolchain, refer to the README for details"
-            exit 1
-        fi
+        bash <(wget --no-check-certificate -qO- "$url") -S
 
         if $binutils; then
             make_opts="CC=clang"
