@@ -33,6 +33,7 @@ name="${NAME:-$repo_name}"
 python_version="${PYTHON_VERSION:-3}"
 
 msg "Updating container..."
+echo nameserver 8.8.8.8 | sudo tee /etc/resolv.conf
 apt update && apt upgrade -y
 msg "Installing essential packages..."
 apt install -y --no-install-recommends git make bc bison openssl \
