@@ -38,7 +38,7 @@ apt update && apt upgrade -y
 msg "Installing essential packages..."
 apt install -y --no-install-recommends git make bc bison openssl \
     curl zstd tar libxml2 zip kmod cpio flex libelf-dev libssl-dev libtfm-dev wget \
-    device-tree-compiler ca-certificates python3 python2 xz-utils
+    device-tree-compiler ca-certificates python3 python2 mold xz-utils
 ln -sf "/usr/bin/python${python_version}" /usr/bin/python
 set_output hash "$(cd "$kernel_path" && git rev-parse HEAD || exit 127)"
 msg "Installing toolchain..."
@@ -241,15 +241,15 @@ tag="$(git branch | sed 's/*\ //g')"
 echo "branch/tag: $tag"
 echo "make options:" $arch_opts $make_opts $host_make_opts
 msg "Generating defconfig from \`make $defconfig\`..."
-if ! make O=out $arch_opts $make_opts $host_make_opts "$defconfig"; then
+if ! mold -run make O=out $arch_opts $make_opts $host_make_opts "$defconfig"; then
     err "Failed generating .config, make sure it is actually available in arch/${arch}/configs/ and is a valid defconfig file"
     exit 2
 fi
 msg "Begin building kernel..."
 
-make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)" prepare
+mold -run make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)" prepare
 
-if ! make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)"; then
+if ! mold -run make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)"; then
     err "Failed building kernel, probably the toolchain is not compatible with the kernel, or kernel source problem"
     exit 3
 fi
